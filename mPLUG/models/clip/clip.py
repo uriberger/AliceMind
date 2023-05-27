@@ -81,7 +81,7 @@ def load(name: str, device: Union[str, torch.device] = "cuda" if torch.cuda.is_a
             jit = False
         state_dict = torch.load(model_path, map_location="cpu")
         model = build_model(state_dict)#.to(device)
-    n_px = model.visual.input_resolution
+    n_px = model.input_resolution
 
     transform = Compose([
         Resize(n_px, interpolation=Image.BICUBIC),
