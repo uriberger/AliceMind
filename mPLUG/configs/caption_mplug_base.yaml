@@ -1,11 +1,11 @@
 
-train_file: ['data/coco_object/coco_caption_train_ocr.json']
-val_file: ['data/coco_object/coco_caption_test_ocr.json']            
-test_file: ['data/coco_object/coco_caption_test_ocr.json']
+train_file: ['data/coco_object/coco_caption_train.json']
+val_file: ['data/coco_object/coco_caption_val.json']            
+test_file: ['data/coco_object/coco_caption_test.json']
 
 read_local_data: True
 
-coco_root: 'img_root/coco_2014/'
+coco_root: '/cs/labs/oabend/uriber/datasets/COCO'
 bert_config: 'configs/config_bert_stride3.json'
 
 image_res: 384

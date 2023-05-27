@@ -3,3 +3,4 @@ mplug_base.pth
 *~
 slurm-*.out
 output/*
+data/*
