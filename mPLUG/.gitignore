@@ -1,3 +1,5 @@
 language_evaluation*
 mplug_base.pth
 *~
+slurm-*.out
+output/*
