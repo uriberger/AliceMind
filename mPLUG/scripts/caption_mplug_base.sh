@@ -2,7 +2,7 @@
 
 for lr in 1e-5
 do
-    CUDA_VISIBLE_DEVICES=0 python -m torch.distributed.launch --nproc_per_node=4 --master_port=3224  --use_env caption_mplug.py \
+    CUDA_VISIBLE_DEVICES=0 venv/bin/python caption_mplug.py \
     --config ./configs/caption_mplug_base.yaml \
     --output_dir output/coco_caption_base_$lr \
     --checkpoint ./mplug_base.pth \
