@@ -163,9 +163,9 @@ class coco_dataset(Dataset):
             sentences = each["sentences"]
             filepath = each["filepath"]
             if filepath == "val2014":
-                file_root = "val2014_img"
+                file_root = "val2014"
             elif filepath == "train2014":
-                file_root = "train2014_img"
+                file_root = "train2014"
             else:
                 file_root = filepath
             image_path = os.path.join(file_root, filename)
