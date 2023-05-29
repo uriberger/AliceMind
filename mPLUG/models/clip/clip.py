@@ -63,7 +63,7 @@ def available_models():
 
 def load(name: str, device: Union[str, torch.device] = "cuda" if torch.cuda.is_available() else "cpu",
          jit: bool = False, download_root: str = None):
-    if name in _MODELS:
+    '''if name in _MODELS:
         model_path = _download(_MODELS[name], download_root or os.path.expanduser("~/.cache/clip"))
     elif os.path.isfile(name):
         model_path = name
@@ -80,8 +80,12 @@ def load(name: str, device: Union[str, torch.device] = "cuda" if torch.cuda.is_a
             warnings.warn(f"File {model_path} is not a JIT archive. Loading as a state dict instead")
             jit = False
         state_dict = torch.load(model_path, map_location="cpu")
-        model = build_model(state_dict)#.to(device)
-    n_px = model.input_resolution.item()
+        model = build_model(state_dict)#.to(device)'''
+    import clip as openai_clip
+    openai_model, _ = openai_clip.load(name, device=device)
+    state_dict = openai_model.state_dict()
+    model = build_model(state_dict)
+    n_px = model.visual.input_resolution
 
     transform = Compose([
         Resize(n_px, interpolation=Image.BICUBIC),
