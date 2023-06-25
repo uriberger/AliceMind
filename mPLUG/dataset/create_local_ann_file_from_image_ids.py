@@ -16,7 +16,7 @@ for image_id in image_id_list:
     sample = [x for x in all_coco_data if x['cocoid'] == image_id][0]
     caption_inds = random.sample(range(len(sample['sentences'])), 2)
     res = sample
-    res['sentences'] = [res['sentences'][i] for i in range(caption_inds)]
+    res['sentences'] = [res['sentences'][i] for i in caption_inds]
     ann_data.append(res)
 
 with open('ann.json', 'w') as fp:
