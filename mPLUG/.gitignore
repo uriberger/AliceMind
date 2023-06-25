@@ -4,3 +4,4 @@ mplug_base.pth
 slurm-*.out
 output/*
 data/*
+reformulation_data/*
