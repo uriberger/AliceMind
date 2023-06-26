@@ -29,7 +29,7 @@ for sample in data:
 
 for image_id, sentences in image_id_to_sentences.items():
     orig_sample = [x for x in all_coco_data if x['cocoid'] == image_id][0]
-    res = sample
+    res = orig_sample
     res['sentences'] = sentences
     ann_data.append(res)
 
