@@ -1,5 +1,5 @@
 
-train_file: ['data/coco_object/coco_caption_train.json']
+train_file: ['reformulation_data/batch_1/batch_1_data.json']
 val_file: ['data/coco_object/coco_caption_val.json']            
 test_file: ['data/coco_object/coco_caption_test.json']
 
@@ -24,5 +24,5 @@ bos: '[CLS]'
 prompt: ''
 
 optimizer: {opt: adamW, lr1: 1e-5, lr2: 5e-6, weight_decay: 0.02}
-schedular: {sched: cosine, lr: 1e-5, epochs: 5, min_lr: 1e-6, decay_rate: 1, warmup_lr: 1e-5, warmup_epochs: 4, cooldown_epochs: 0}
+schedular: {sched: cosine, lr: 1e-5, epochs: 1, min_lr: 1e-6, decay_rate: 1, warmup_lr: 1e-5, warmup_epochs: 4, cooldown_epochs: 0}
 use_checkpoint: True
