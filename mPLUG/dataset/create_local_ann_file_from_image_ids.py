@@ -22,3 +22,4 @@ for image_id in image_id_list:
 with open('ann.json', 'w') as fp:
     fp.write(json.dumps(ann_data))
 
+print('Finished, loaded ' + str(len(ann_data)) + ' images with ' + str(sum([len(x['sentences']) for x in ann_data])) + ' captions')
