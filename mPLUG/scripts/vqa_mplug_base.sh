@@ -1,3 +1,4 @@
+#!/bin/sh
 # deepspeed==0.5.8
 
 python -m torch.distributed.launch --nproc_per_node=8 \
