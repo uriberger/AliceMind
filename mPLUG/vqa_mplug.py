@@ -1,6 +1,6 @@
 import argparse
 import os
-import ruamel_yaml as yaml
+import ruamel.yaml as yaml
 import numpy as np
 import random
 import time
@@ -169,8 +169,8 @@ def cal_metric(vqa_result, val_file):
     return score / len(vqa_result)
 
 def main(args, config):
-    print('master addr: ', os.environ['MASTER_ADDR'])
-    print('master port: ', os.environ['MASTER_PORT'])
+    #print('master addr: ', os.environ['MASTER_ADDR'])
+    #print('master port: ', os.environ['MASTER_PORT'])
     # fix the seed for reproducibility
     seed = args.seed + utils.get_rank()
     torch.manual_seed(seed)
@@ -246,7 +246,7 @@ def main(args, config):
             dist_init_required=True
         )
 
-    device = torch.device(args.device + ':' + os.environ['LOCAL_RANK'])
+    device = torch.device(args.device)
     print('local device:', device)
 
     #### Dataset ####
