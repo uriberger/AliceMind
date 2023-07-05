@@ -103,14 +103,11 @@ def evaluation(model, data_loader, tokenizer, device, config):
 
     result = []
 
-    answer_list = [answer + config['eos'] for answer in data_loader.dataset.answer_list]
-    answer_input = tokenizer(answer_list, padding='longest', return_tensors='pt').to(device)
-
     for n, (image, question, question_id) in enumerate(metric_logger.log_every(data_loader, print_freq, header)):
         image = image.to(device, non_blocking=True)
         question_input = tokenizer(question, padding='longest', return_tensors="pt").to(device)
 
-        topk_ids, topk_probs = model(image, question_input, answer_input, train=False, k=config['k_test'])
+        topk_ids, topk_probs = model(image, question_input, answer=None, train=False, k=config['k_test'])
 
         for ques_id, topk_id, topk_prob in zip(question_id, topk_ids, topk_probs):
             ques_id = int(ques_id.item())          
@@ -129,13 +126,11 @@ def evaluate(model, data_loader, dataset, tokenizer, device, config):
     header = 'Evaluation:'
     print_freq = 50
     
-    answer_list = [answer+config['eos'] for answer in data_loader.dataset.answer_list]
-    answer_input = tokenizer(answer_list, padding='longest', return_tensors='pt').to(device)    
     for n, (image, question, question_id) in enumerate(metric_logger.log_every(data_loader, print_freq, header)):        
         image = image.to(device,non_blocking=True)             
         question_input = tokenizer(question, padding='longest', return_tensors="pt").to(device)        
 
-        topk_ids, topk_probs = model(image, question_input, answer_input, train=False, k=config['k_test'])      
+        topk_ids, topk_probs = model(image, question_input, answer=None, train=False, k=config['k_test'])      
         result = []
         
         for ques_id, topk_id, topk_prob in zip(question_id, topk_ids, topk_probs):
@@ -248,6 +243,7 @@ def main(args, config):
 
     device = torch.device(args.device)
     print('local device:', device)
+    model.to(device)
 
     #### Dataset ####
     print("Creating vqa datasets")

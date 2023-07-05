@@ -97,11 +97,10 @@ class vqa_dataset(Dataset):
         
 
 class vqa_local_dataset(Dataset):
-    def __init__(self, ann_file, transform, coco_root, eos='[SEP]', split="train", max_ques_words=30, answer_list='', read_local_data=True, add_ocr=False, add_object=False):
+    def __init__(self, ann_file, transform, coco_root, eos='[SEP]', split="train", max_ques_words=30, read_local_data=True, add_ocr=False, add_object=False):
         self.split = split        
         self.ann = []
-        for f in ann_file:
-            self.ann += json.load(open(f,'r'))
+        self.ann = json.load(open(ann_file,'r'))
 
         self.transform = transform
         self.coco_root = coco_root
@@ -113,7 +112,6 @@ class vqa_local_dataset(Dataset):
         
         if split=='test':
             self.max_ques_words = 50 # do not limit question length during test
-            self.answer_list = json.load(open(answer_list,'r'))    
         if self.add_ocr:
             self.max_ques_words = 30
         
@@ -144,7 +142,7 @@ class vqa_local_dataset(Dataset):
             question = question + " [SEP] " + " ".join(objects.split("&&"))
         # question = pre_question(question,self.max_ques_words)   
         if self.split == 'test':
-            question_id = ann['question_id']            
+            question_id = ann['question_id']
             return image, question, question_id
 
         elif self.split=='train':                                   
