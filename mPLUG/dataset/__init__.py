@@ -6,7 +6,7 @@ from PIL import Image
 from dataset.caption_dataset import re_train_dataset, re_eval_dataset, pretrain_dataset_4m, coco_dataset, nocaps_dataset
 from dataset.nlvr_dataset import nlvr_dataset
 from dataset.ve_dataset import ve_dataset
-from dataset.vqa_dataset import vqa_dataset
+from dataset.vqa_dataset import vqa_dataset, vqa_local_dataset
 from dataset.grounding_dataset import build_uni_training_dataset,build_vg_dataset
 from dataset.videoqa_dataset import videoqa_dataset
 from dataset.video_dataset import vatex_video_caps_dataset
@@ -48,11 +48,15 @@ def create_dataset(dataset, config, epoch=None):
         val_dataset = re_eval_dataset(config['val_file'], test_transform, config['image_root'])
         test_dataset = re_eval_dataset(config['test_file'], test_transform, config['image_root'])
         return train_dataset, val_dataset, test_dataset
-               
     elif dataset=='vqa': 
         train_dataset = vqa_dataset(config['train_file'], train_transform, config['vqa_root'], config['vg_root'], config['gqa_root'], split='train', read_local_data=config['read_local_data'], add_ocr=config['add_ocr'], add_object=config['add_object']) 
         vqa_test_dataset = vqa_dataset(config['test_file'], test_transform, config['vqa_root'], config['vg_root'], config['gqa_root'], split='test', answer_list=config['answer_list'], read_local_data=config['read_local_data'], add_ocr=config['add_ocr'], add_object=config['add_object'])       
         vqa_val_dataset = vqa_dataset(config['val_file'], test_transform, config['vqa_root'], config['vg_root'], config['gqa_root'],split='test', answer_list=config['answer_list'], read_local_data=config['read_local_data'], add_ocr=config['add_ocr'], add_object=config['add_object'])       
+        return train_dataset, vqa_val_dataset, vqa_test_dataset
+    elif dataset=='local_vqa': 
+        train_dataset = vqa_local_dataset(config['local_train_file'], train_transform, config['coco_root'], split='train', read_local_data=config['read_local_data'], add_ocr=config['add_ocr'], add_object=config['add_object']) 
+        vqa_test_dataset = vqa_local_dataset(config['local_test_file'], test_transform, config['coco_root'], split='test', answer_list=config['answer_list'], read_local_data=config['read_local_data'], add_ocr=config['add_ocr'], add_object=config['add_object'])       
+        vqa_val_dataset = vqa_local_dataset(config['local_val_file'], test_transform, config['coco_root'], split='test', answer_list=config['answer_list'], read_local_data=config['read_local_data'], add_ocr=config['add_ocr'], add_object=config['add_object'])       
         return train_dataset, vqa_val_dataset, vqa_test_dataset
     elif dataset== 'nocaps':
         val_dataset = nocaps_dataset(config['val_file'], test_transform, config['nocaps_root'], max_words=config['max_length'], read_local_data=config['read_local_data'], is_train=False, add_object=config['add_object'])

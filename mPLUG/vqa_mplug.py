@@ -251,7 +251,10 @@ def main(args, config):
 
     #### Dataset ####
     print("Creating vqa datasets")
-    datasets = create_dataset('vqa', config)
+    if 'local_train_file' in config:
+        datasets = create_dataset('local_vqa', config)
+    else:
+        datasets = create_dataset('vqa', config)
 
     if args.distributed:
         num_tasks = utils.get_world_size()
