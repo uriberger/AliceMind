@@ -8,5 +8,5 @@ venv/bin/python vqa_mplug.py \
     --do_two_optim \
     --add_object \
     --max_input_length 80 \
-    --do_amp \
+    --max_length 50 \
     --add_ocr

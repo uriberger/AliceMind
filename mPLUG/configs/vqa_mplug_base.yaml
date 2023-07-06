@@ -18,7 +18,7 @@ coco_root: '/cs/labs/oabend/uriber/datasets/COCO'
 bert_config: 'configs/config_bert_stride3.json'
 
 image_res: 384
-batch_size_train: 128
+batch_size_train: 32
 vision_width: 768
 distill: True
 clip_name: "ViT-B-16"

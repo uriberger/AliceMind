@@ -63,18 +63,18 @@ def train(model, data_loader, optimizer, tokenizer, epoch, warmup_steps, device,
         #if accum_steps > 1:
         #    loss = loss / accum_steps
 
-        #if do_amp:
-        #    from apex import amp
-        #    with amp.scale_loss(loss, optimizer) as scaled_loss:
-        #        # logger.info('scaled loss: {}'.format(str(scaled_loss)))
-        #        scaled_loss.backward()
-        #else:
-        #    loss.backward()
-        #if (i + 1) % accum_steps == 0:
-        #    optimizer.step()
-        #    optimizer.zero_grad()
-        model.backward(loss)
-        model.step()
+        if do_amp:
+            from apex import amp
+            with amp.scale_loss(loss, optimizer) as scaled_loss:
+                # logger.info('scaled loss: {}'.format(str(scaled_loss)))
+                scaled_loss.backward()
+        else:
+            loss.backward()
+        if (i + 1) % accum_steps == 0:
+            optimizer.step()
+            optimizer.zero_grad()
+        #model.backward(loss)
+        #model.step()
         metric_logger.update(loss=loss.item())
 
         if do_two_optim:
@@ -137,10 +137,10 @@ def evaluate(model, data_loader, dataset, tokenizer, device, config):
             ques_id = int(ques_id.item())          
             ans = tokenizer.decode(topk_id[0]).replace("[SEP]", "").replace("[CLS]", "").replace("[PAD]", "").strip()
             result.append({"question_id":ques_id, "answer":ans})   
-        accuracy = cal_metric(result, dataset)
+        # accuracy = cal_metric(result, dataset)
         # accuracy = (targets == pred_class).sum() / targets.size(0)
         #
-        metric_logger.meters['acc'].update(accuracy, n=image.size(0))
+        #metric_logger.meters['acc'].update(accuracy, n=image.size(0))
 
     # gather the stats from all processes
     torch.cuda.empty_cache()
@@ -280,7 +280,14 @@ def main(args, config):
 
             train_stats = train(model, train_loader, optimizer, tokenizer, epoch, warmup_steps, device, lr_scheduler,
                                 config, do_amp=args.do_amp, do_two_optim=args.do_two_optim, accum_steps=args.accum_steps)
-            model.save_checkpoint(os.path.join(args.output_dir), tag='{}.pt'.format(model.global_steps))
+            #model.save_checkpoint(os.path.join(args.output_dir), tag='{}.pt'.format(model.global_steps))
+            torch.save({
+                'model': model.state_dict(),
+                'optimizer': optimizer.state_dict(),
+                'lr_scheduler': lr_scheduler.state_dict(),
+                'config': config,
+                'epoch': epoch,
+            }, os.path.join(args.output_dir, 'checkpoint_%02d.pth' % epoch))
         val_stats = evaluate(model, val_loader, config["label_file"], tokenizer, device, config)
         if epoch >= 5:
             vqa_result = evaluation(model, test_loader, tokenizer, device, config)
