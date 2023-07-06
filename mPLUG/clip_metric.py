@@ -21,7 +21,7 @@ with open('output/after_batch_5_gt_clip/result/vqa_result_epoch0.json', 'r') as 
     clip_data = json.load(fp)
     clip_data = reshape_output_list(clip_data)
 with open('reformulation_data/test_ids.json', 'r') as fp:
-    image_ids = json.load(fp)[:10]
+    image_ids = json.load(fp)
 image_ids_dict = {x: True for x in image_ids}
 
 res = [0]*4
