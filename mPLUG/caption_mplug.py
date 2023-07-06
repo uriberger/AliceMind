@@ -210,15 +210,16 @@ def main(args, config):
     model = MPLUG(config=config, tokenizer=tokenizer)
     model = model.to(device)
 
-    if not args.do_two_optim:
-        arg_opt = utils.AttrDict(config['optimizer'])
-        optimizer = create_optimizer(arg_opt, model)
-    else:
-        arg_opt = utils.AttrDict(config['optimizer'])
-        optimizer = create_two_optimizer(arg_opt, model)
+    if not args.evaluate:
+        if not args.do_two_optim:
+            arg_opt = utils.AttrDict(config['optimizer'])
+            optimizer = create_optimizer(arg_opt, model)
+        else:
+            arg_opt = utils.AttrDict(config['optimizer'])
+            optimizer = create_two_optimizer(arg_opt, model)
 
-    arg_sche = utils.AttrDict(config['schedular'])
-    lr_scheduler, _ = create_scheduler(arg_sche, optimizer)
+        arg_sche = utils.AttrDict(config['schedular'])
+        lr_scheduler, _ = create_scheduler(arg_sche, optimizer)
 
     if args.do_amp:
         from apex import amp
@@ -265,8 +266,8 @@ def main(args, config):
     start_time = time.time()
     vqa_result = evaluation(model, test_loader, tokenizer, device, config)
     result_file = save_result(vqa_result, args.result_dir, 'vqa_result_epoch10')
-    if utils.is_main_process():
-        result = cal_metric(result_file)
+    '''if utils.is_main_process():
+        result = cal_metric(result_file)'''
     #dist.barrier()
     for epoch in range(start_epoch, max_epoch):
         if epoch > 0:
