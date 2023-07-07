@@ -56,7 +56,7 @@ for sample in data:
     question_input = tokenizer(question, padding='longest', return_tensors="pt").to(device)
     topk_ids, topk_probs = model(image, question_input, answer=None, train=False, k=config['k_test'])
     ans = tokenizer.decode(topk_ids[0][0]).replace("[SEP]", "").replace("[CLS]", "").replace("[PAD]", "").strip()
-    res.append({'cocoid': image_id, 'sentences': [ans]})
+    res.append({'cocoid': image_id, 'sentences': [{'raw': ans}], 'filepath': 'val2014', 'filename': 'COCO_val2014_' + str(image_id).zfill(12) + '.jpg'})
 
 with open('ann.json', 'w') as fp:
     fp.write(json.dumps(res))
