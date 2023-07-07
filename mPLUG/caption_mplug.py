@@ -287,7 +287,8 @@ def main(args, config):
         vqa_result = evaluation(model, test_loader, tokenizer, device, config)
         result_file = save_result(vqa_result, args.result_dir, 'vqa_result_epoch%d' % epoch)
         if utils.is_main_process():
-            result = cal_metric(result_file)
+            if not args.no_eval_tool:
+                result = cal_metric(result_file)
             log_stats = {**{f'train_{k}': v for k, v in train_stats.items()},
                          'epoch': epoch,
                          }
@@ -336,6 +337,7 @@ if __name__ == '__main__':
     parser.add_argument('--no_init_decocde', action='store_true')
     parser.add_argument('--do_accum', action='store_true')
     parser.add_argument('--accum_steps', default=4, type=int)
+    parser.add_argument('--no_eval_tool', action='store_true')
     args = parser.parse_args()
 
     config = yaml.load(open(args.config, 'r'), Loader=yaml.Loader)
