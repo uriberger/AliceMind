@@ -2,6 +2,8 @@ import argparse
 import json
 import os
 import random
+import sys
+sys.path.append('.')
 from uri_utils import reshape_output_list
 
 if __name__ == '__main__':
