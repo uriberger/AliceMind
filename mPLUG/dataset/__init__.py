@@ -3,7 +3,7 @@ from torch.utils.data import DataLoader
 from torchvision import transforms
 from PIL import Image
 
-from dataset.caption_dataset import re_train_dataset, re_eval_dataset, pretrain_dataset_4m, coco_dataset, nocaps_dataset
+from dataset.caption_dataset import re_train_dataset, re_eval_dataset, pretrain_dataset_4m, coco_dataset, pascal_dataset, nocaps_dataset
 from dataset.nlvr_dataset import nlvr_dataset
 from dataset.ve_dataset import ve_dataset
 from dataset.vqa_dataset import vqa_dataset, vqa_local_dataset
@@ -66,6 +66,11 @@ def create_dataset(dataset, config, epoch=None):
         train_dataset = coco_dataset(config['train_file'], train_transform, config['coco_root'], max_words=config['max_length'], read_local_data=config['read_local_data'], is_train=True, add_object=config['add_object'])
         val_dataset = coco_dataset(config['val_file'], test_transform, config['coco_root'], max_words=config['max_length'], read_local_data=config['read_local_data'], is_train=False, add_object=config['add_object'])
         test_dataset = coco_dataset(config['test_file'], test_transform, config['coco_root'], max_words=config['max_length'], read_local_data=config['read_local_data'], is_train=False, add_object=config['add_object'])
+        return train_dataset, val_dataset, test_dataset
+    elif dataset== 'pascal':
+        train_dataset = coco_dataset(config['train_file'], train_transform, config['coco_root'], max_words=config['max_length'], is_train=True)
+        val_dataset = pascal_dataset(config['pascal_file'], test_transform, config['pascal_root'], max_words=config['max_length'], is_train=False)
+        test_dataset = pascal_dataset(config['pascal_file'], test_transform, config['pascal_root'], max_words=config['max_length'], is_train=False)
         return train_dataset, val_dataset, test_dataset
     elif dataset=='nlvr':   
         train_dataset = nlvr_dataset(config['train_file'], train_transform, config['image_root'])  

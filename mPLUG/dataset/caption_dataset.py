@@ -270,3 +270,38 @@ class pretrain_dataset_4m(Dataset):
                 break
                 
         return image, caption
+    
+class pascal_dataset(Dataset):
+    def __init__(self, ann_file, transform, root_path, max_words=30, is_train=True):
+        self.ann = []
+        for f in ann_file:
+            self.ann += json.load(open(f,'r'))
+        self.transform = transform
+        self.max_words = max_words
+        self.root_path = root_path
+        self.ann_new = []
+        for each in self.ann:
+            sentences = each["captions"]
+            image_path = each['image']
+            gold_caption = [x.lower() for x in sentences]
+            if is_train:
+                for sent in sentences:
+                    caption = sent.lower()
+                    self.ann_new.append({"image": image_path, "image_id": each['image_id'], "caption": caption, "gold_caption": gold_caption})
+            else:
+                self.ann_new.append({"image": image_path, "image_id": each['image_id'], "caption": sentences[0].lower(), "gold_caption": gold_caption})
+        self.ann = self.ann_new
+        del self.ann_new            
+        
+    def __len__(self):
+        return len(self.ann)
+
+    def __getitem__(self, index):    
+        ann = self.ann[index]
+        caption = ann['caption']
+        image_id = ann['image_id']
+        image_path = os.path.join(self.root_path, ann['image'])
+        image = Image.open(image_path).convert('RGB')
+        image = self.transform(image)
+                
+        return image, caption, None, image_id, ann["gold_caption"]
