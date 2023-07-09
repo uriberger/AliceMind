@@ -6,3 +6,4 @@ output/*
 data/*
 reformulation_data/*
 automatic_reformulation_data/*
+pascal_data/*
