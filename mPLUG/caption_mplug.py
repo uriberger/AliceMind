@@ -188,7 +188,7 @@ def main(args, config):
 
     #### Dataset ####
     print("Creating vqa datasets")
-    datasets = create_dataset('coco', config)
+    datasets = create_dataset(args.caption_dataset, config)
 
     if args.distributed:
         num_tasks = utils.get_world_size()
@@ -338,6 +338,7 @@ if __name__ == '__main__':
     parser.add_argument('--do_accum', action='store_true')
     parser.add_argument('--accum_steps', default=4, type=int)
     parser.add_argument('--no_eval_tool', action='store_true')
+    parser.add_argument('--caption_dataset', default='coco')
     args = parser.parse_args()
 
     config = yaml.load(open(args.config, 'r'), Loader=yaml.Loader)
