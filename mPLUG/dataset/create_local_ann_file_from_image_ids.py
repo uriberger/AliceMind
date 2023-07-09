@@ -26,7 +26,7 @@ if __name__ == '__main__':
         if args.clip_image_id_to_caption_inds_file is None:
             image_id_to_caption_inds_file = 'reformulation_data/batch_' + str(batch_ind) + '/image_id_to_caption_inds.json'
         else:
-            image_id_to_caption_inds_file = args.image_id_to_caption_inds_file
+            image_id_to_caption_inds_file = args.clip_image_id_to_caption_inds_file
         with open(image_id_to_caption_inds_file, 'r') as fp:
             image_id_to_caption_inds = json.load(fp)
     
