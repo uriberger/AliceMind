@@ -1,5 +1,5 @@
 
-train_file: ['reformulation_data/batch_1/batch_1_data.json']
+train_file: ['reformulation_data/batch_1/batch_1_reformulation_data.json']
 val_file: ['data/coco_object/coco_caption_val.json']            
 test_file: ['data/coco_object/coco_caption_test.json']
 
