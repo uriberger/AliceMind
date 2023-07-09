@@ -7,7 +7,7 @@ pascal_file: ['pascal_data/pascal_orig.json']
 read_local_data: True
 
 coco_root: '/cs/labs/oabend/uriber/datasets/COCO'
-pascal_root: '/cs/labs/oabend/uriber/datasets/pascal'
+pascal_root: '/cs/labs/oabend/uriber/datasets/pascal_sentences'
 bert_config: 'configs/config_bert_stride3.json'
 
 image_res: 384
