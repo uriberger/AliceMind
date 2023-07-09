@@ -9,6 +9,7 @@ if __name__ == '__main__':
     parser.add_argument('--batch_ind', type=int)
     parser.add_argument('--data_dir', default='reformulation_data')
     parser.add_argument('--select_caption_method', default='random')
+    parser.add_argument('--clip_image_id_to_caption_inds_file')
     parser.add_argument('--data_file')
     args = parser.parse_args()
 
@@ -20,7 +21,11 @@ if __name__ == '__main__':
     assert select_caption_method in ['random', 'clip'], 'Unknown select caption method ' + str
 
     if select_caption_method == 'clip':
-        with open('reformulation_data/batch_' + str(batch_ind) + '/image_id_to_caption_inds.json', 'r') as fp:
+        if args.clip_image_id_to_caption_inds_file is None:
+            image_id_to_caption_inds_file = 'reformulation_data/batch_' + str(batch_ind) + '/image_id_to_caption_inds.json'
+        else:
+            image_id_to_caption_inds_file = args.image_id_to_caption_inds_file
+        with open(image_id_to_caption_inds_file, 'r') as fp:
             image_id_to_caption_inds = json.load(fp)
     
     ann_data = []
