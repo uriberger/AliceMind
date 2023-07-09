@@ -304,4 +304,4 @@ class pascal_dataset(Dataset):
         image = Image.open(image_path).convert('RGB')
         image = self.transform(image)
                 
-        return image, caption, None, image_id, ann["gold_caption"]
+        return image, caption, '', image_id, ann["gold_caption"]
