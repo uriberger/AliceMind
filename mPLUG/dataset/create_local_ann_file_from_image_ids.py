@@ -13,6 +13,7 @@ if __name__ == '__main__':
     parser.add_argument('--select_caption_method', default='random')
     parser.add_argument('--clip_image_id_to_caption_inds_file')
     parser.add_argument('--data_file')
+    parser.add_argument('--captions_per_image', type=int, default=2)
     args = parser.parse_args()
 
     batch_ind = args.batch_ind
@@ -43,9 +44,9 @@ if __name__ == '__main__':
     for image_id in image_id_list:
         sample = [x for x in all_coco_data if x['cocoid'] == image_id][0]
         if select_caption_method == 'random':
-            caption_inds = random.sample(range(len(sample['sentences'])), 2)
+            caption_inds = random.sample(range(len(sample['sentences'])), args.captions_per_image)
         elif select_caption_method == 'clip':
-            caption_inds = image_id_to_caption_inds[str(image_id)]
+            caption_inds = image_id_to_caption_inds[str(image_id)][:args.captions_per_image]
         res = sample
         res['sentences'] = [res['sentences'][i] for i in caption_inds]
         ann_data.append(res)

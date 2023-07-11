@@ -46,19 +46,19 @@ do
 
     # gt
     echo "$MSG_PREFIX gt training"
-    venv/bin/python dataset/create_local_ann_file_from_image_ids.py --batch_ind ${BATCH_IND} --data_dir $AUTO_DIR
+    venv/bin/python dataset/create_local_ann_file_from_image_ids.py --batch_ind ${BATCH_IND} --data_dir $AUTO_DIR --captions_per_image 1
     mv ann.json $AUTO_DIR/batch_${BATCH_IND}/batch_${BATCH_IND}_gt_data.json
     $CMD_PREFIX --config $AUTO_DIR/batch_${BATCH_IND}/gt_config.yaml --output_dir $OUTPUT_DIR/after_batch_${BATCH_IND}_gt --checkpoint $PREV_BATCH_GT_MODEL $ARGS
 
     # gt2
     echo "$MSG_PREFIX gt2 training"
-    venv/bin/python dataset/create_local_ann_file_from_image_ids.py --batch_ind ${BATCH_IND} --data_dir $AUTO_DIR
+    venv/bin/python dataset/create_local_ann_file_from_image_ids.py --batch_ind ${BATCH_IND} --data_dir $AUTO_DIR --captions_per_image 1
     mv ann.json $AUTO_DIR/batch_${BATCH_IND}/batch_${BATCH_IND}_gt2_data.json
     $CMD_PREFIX --config $AUTO_DIR/batch_${BATCH_IND}/gt2_config.yaml --output_dir $OUTPUT_DIR/after_batch_${BATCH_IND}_gt2 --checkpoint $PREV_BATCH_GT2_MODEL $ARGS
 
     # clip
     echo "$MSG_PREFIX clip training"
-    venv/bin/python dataset/create_local_ann_file_from_image_ids.py --batch_ind ${BATCH_IND} --select_caption_method clip --clip_image_id_to_caption_inds_file $AUTO_DIR/image_id_to_caption_inds.json --data_dir $AUTO_DIR
+    venv/bin/python dataset/create_local_ann_file_from_image_ids.py --batch_ind ${BATCH_IND} --select_caption_method clip --clip_image_id_to_caption_inds_file $AUTO_DIR/image_id_to_caption_inds.json --data_dir $AUTO_DIR --captions_per_image 1
     mv ann.json $AUTO_DIR/batch_${BATCH_IND}/batch_${BATCH_IND}_clip_data.json
     $CMD_PREFIX --config $AUTO_DIR/batch_${BATCH_IND}/clip_config.yaml --output_dir $OUTPUT_DIR/after_batch_${BATCH_IND}_clip --checkpoint $PREV_BATCH_CLIP_MODEL $ARGS
 
