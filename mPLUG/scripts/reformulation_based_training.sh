@@ -40,7 +40,7 @@ do
     echo "$MSG_PREFIX reformulation training"
     INPUT_DATA=${AUTO_DIR}/batch_${BATCH_IND}/batch_${BATCH_IND}_input_data.json
     venv/bin/python reshape_and_filter.py $PREV_BATCH_RE_OUTPUT $AUTO_DIR/batch_${BATCH_IND}/batch_${BATCH_IND}_image_ids.json $INPUT_DATA
-    venv/bin/python reformulate.py output/vqa_mplug_base/checkpoint_07.pth $INPUT_DATA
+    venv/bin/python reformulate.py --model_path output/vqa_mplug_base/checkpoint_07.pth --input_file $INPUT_DATA
     mv ann.json ${AUTO_DIR}/batch_${BATCH_IND}/batch_${BATCH_IND}_reformulation_data.json
     $CMD_PREFIX --config $AUTO_DIR/batch_${BATCH_IND}/reformulation_config.yaml --output_dir $OUTPUT_DIR/after_batch_${BATCH_IND}_reformulations --checkpoint $PREV_BATCH_RE_MODEL $ARGS
 
