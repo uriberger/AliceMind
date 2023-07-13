@@ -10,7 +10,11 @@ from models.model_vqa_mplug import MPLUG
 from models.tokenization_bert import BertTokenizer
 from models.vit import resize_pos_embed
 
-assert len(sys.argv) == 3
+assert len(sys.argv) == 3 or len(sys.argv) == 4
+if len(sys_argv) == 3:
+    split = 'val'
+else:
+    split = 'train'
 
 model_path = sys.argv[1]
 with open(sys.argv[2], 'r') as fp:
@@ -46,7 +50,7 @@ transform = transforms.Compose([
 res = []
 for sample in data:
     image_id = sample['image_id']
-    image_path = os.path.join(coco_root, 'val2014', 'COCO_val2014_' + str(image_id).zfill(12) + '.jpg')
+    image_path = os.path.join(coco_root, f'{split}2014', f'COCO_{split}2014_' + str(image_id).zfill(12) + '.jpg')
     image = Image.open(image_path).convert('RGB')
     image = transform(image)
     image = image.to(device, non_blocking=True)
@@ -56,7 +60,7 @@ for sample in data:
     question_input = tokenizer(question, padding='longest', return_tensors="pt").to(device)
     topk_ids, topk_probs = model(image, question_input, answer=None, train=False, k=config['k_test'])
     ans = tokenizer.decode(topk_ids[0][0]).replace("[SEP]", "").replace("[CLS]", "").replace("[PAD]", "").strip()
-    res.append({'cocoid': image_id, 'sentences': [{'raw': ans}], 'filepath': 'val2014', 'filename': 'COCO_val2014_' + str(image_id).zfill(12) + '.jpg'})
+    res.append({'cocoid': image_id, 'sentences': [{'raw': ans}], 'filepath': f'{split}2014', 'filename': f'COCO_{split}2014_' + str(image_id).zfill(12) + '.jpg'})
 
 with open('ann.json', 'w') as fp:
     fp.write(json.dumps(res))
