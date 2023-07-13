@@ -19,7 +19,7 @@ if __name__ == '__main__':
     parser.add_argument('--input_file', required=True)
     args = parser.parse_args()
 
-    split = args.aplit
+    split = args.split
 
     model_path = args.model_path
     with open(args.input_file, 'r') as fp:
