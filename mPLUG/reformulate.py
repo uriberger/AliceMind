@@ -1,5 +1,7 @@
 import argparse
+import math
 import os
+import time
 import yaml
 import json
 import torch
@@ -17,9 +19,11 @@ if __name__ == '__main__':
     parser.add_argument('--output_format', default='image')
     parser.add_argument('--model_path', required=True)
     parser.add_argument('--input_file', required=True)
+    parser.add_argument('--batch_size', type=int, default=64)
     args = parser.parse_args()
 
     split = args.split
+    batch_size = args.batch_size
 
     model_path = args.model_path
     with open(args.input_file, 'r') as fp:
@@ -53,24 +57,32 @@ if __name__ == '__main__':
         ])
 
     res = []
-    for sample in data:
-        image_id = sample['image_id']
-        image_path = os.path.join(coco_root, f'{split}2014', f'COCO_{split}2014_' + str(image_id).zfill(12) + '.jpg')
-        image = Image.open(image_path).convert('RGB')
-        image = transform(image)
-        image = image.to(device, non_blocking=True)
-        image = image.unsqueeze(0)
+    batch_start = 0
+    batch_ind = 0
+    batch_num = math.ceil(len(data)/batch_size)
+    t = time.time()
+    while batch_start < len(data):
+        if batch_ind % 10 == 0:
+            print(f'Starting batch {batch_ind} out of {batch_num}, time from prev {time.time() - t}', flush=True)
+            t = time.time()
+        batch_end = min(batch_start + batch_size, len(data))
+        image_ids = [data[i]['image_id'] for i in range(batch_start, batch_end)]
+        image_paths = [os.path.join(coco_root, f'{split}2014', f'COCO_{split}2014_' + str(image_id).zfill(12) + '.jpg') for image_id in image_ids]
+        images = torch.cat([transform(Image.open(image_path).convert('RGB')).unsqueeze(0) for image_path in image_paths], dim=0).to(device, non_blocking=True)
 
-        question = sample['caption']
-        question_input = tokenizer(question, padding='longest', return_tensors="pt").to(device)
-        topk_ids, topk_probs = model(image, question_input, answer=None, train=False, k=config['k_test'])
-        ans = tokenizer.decode(topk_ids[0][0]).replace("[SEP]", "").replace("[CLS]", "").replace("[PAD]", "").strip()
+        questions = [data[i]['caption'] for i in range(batch_start, batch_end)]
+        question_input = tokenizer(questions, padding='longest', return_tensors="pt").to(device)
+        topk_ids, topk_probs = model(images, question_input, answer=None, train=False, k=config['k_test'])
+        answers = [tokenizer.decode(topk_ids[i][0]).replace("[SEP]", "").replace("[CLS]", "").replace("[PAD]", "").strip() for i in range(len(topk_ids))]
         if args.output_format == 'image':
-            res.append({'cocoid': image_id, 'sentences': [{'raw': ans}], 'filepath': f'{split}2014', 'filename': f'COCO_{split}2014_' + str(image_id).zfill(12) + '.jpg'})
+            res += [{'cocoid': data[batch_start + i]['image_id'], 'sentences': [{'raw': answers[i]}], 'filepath': f'{split}2014', 'filename': f'COCO_{split}2014_{str(data[batch_start + i]["image_id"]).zfill(12)}.jpg'} for i in range(batch_end-batch_start)]
         elif args.output_format == 'caption':
-            res.append({'image_id': image_id, 'caption': ans})
+            res += [{'image_id': data[batch_start + i]['image_id'], 'caption': answers[i]} for i in range(batch_end-batch_start)]
         else:
             assert False
+
+        batch_start += batch_end
+        batch_ind += 1
 
     with open('ann.json', 'w') as fp:
         fp.write(json.dumps(res))
