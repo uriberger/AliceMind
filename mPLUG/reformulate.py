@@ -12,6 +12,12 @@ from models.model_vqa_mplug import MPLUG
 from models.tokenization_bert import BertTokenizer
 from models.vit import resize_pos_embed
 
+def remove_long_samples(input_ids):
+    inds_to_remove = []
+    for i in range(input_ids.shape[0]):
+        if input_ids[i, 512].item() != 0:
+            inds_to_remove.append(i)
+    return inds_to_remove
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -75,18 +81,24 @@ if __name__ == '__main__':
             with open(output_file_name, 'w') as fp:
                 fp.write(json.dumps(res))
         batch_end = min(batch_start + batch_size, len(data))
-        image_ids = [data[i]['image_id'] for i in range(batch_start, batch_end)]
+        batch_inds = [i for i in range(batch_start, batch_end)]
+
+        questions = [data[i]['caption'] for i in batch_inds]
+        question_input = tokenizer(questions, padding='longest', return_tensors="pt").to(device)
+        if question_input['input_ids'].shape[1] > 512:
+            inds_to_remove = remove_long_samples(question_input['input_ids'])
+            batch_inds = [i for i in batch_inds if i-batch_start not in inds_to_remove]
+
+        image_ids = [data[i]['image_id'] for i in batch_inds]
         image_paths = [os.path.join(coco_root, f'{split}2014', f'COCO_{split}2014_' + str(image_id).zfill(12) + '.jpg') for image_id in image_ids]
         images = torch.cat([transform(Image.open(image_path).convert('RGB')).unsqueeze(0) for image_path in image_paths], dim=0).to(device, non_blocking=True)
 
-        questions = [data[i]['caption'] for i in range(batch_start, batch_end)]
-        question_input = tokenizer(questions, padding='longest', return_tensors="pt").to(device)
         topk_ids, topk_probs = model(images, question_input, answer=None, train=False, k=config['k_test'])
         answers = [tokenizer.decode(topk_ids[i][0]).replace("[SEP]", "").replace("[CLS]", "").replace("[PAD]", "").strip() for i in range(len(topk_ids))]
         if args.output_format == 'image':
-            res += [{'cocoid': data[batch_start + i]['image_id'], 'sentences': [{'raw': answers[i]}], 'filepath': f'{split}2014', 'filename': f'COCO_{split}2014_{str(data[batch_start + i]["image_id"]).zfill(12)}.jpg'} for i in range(batch_end-batch_start)]
+            res += [{'cocoid': data[i]['image_id'], 'sentences': [{'raw': answers[i - batch_start]}], 'filepath': f'{split}2014', 'filename': f'COCO_{split}2014_{str(data[i]["image_id"]).zfill(12)}.jpg'} for i in batch_inds]
         elif args.output_format == 'caption':
-            res += [{'image_id': data[batch_start + i]['image_id'], 'caption': answers[i]} for i in range(batch_end-batch_start)]
+            res += [{'image_id': data[i]['image_id'], 'caption': answers[i - batch_start]} for i in batch_inds]
         else:
             assert False
 
