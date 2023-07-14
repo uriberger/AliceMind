@@ -19,11 +19,13 @@ if __name__ == '__main__':
     parser.add_argument('--output_format', default='image')
     parser.add_argument('--model_path', required=True)
     parser.add_argument('--input_file', required=True)
-    parser.add_argument('--batch_size', type=int, default=64)
+    parser.add_argument('--output_file', required=True)
+    parser.add_argument('--batch_size', type=int, default=16)
     args = parser.parse_args()
 
     split = args.split
     batch_size = args.batch_size
+    output_file_name = args.output_file + '.json'
 
     model_path = args.model_path
     with open(args.input_file, 'r') as fp:
@@ -56,15 +58,22 @@ if __name__ == '__main__':
         normalize,
         ])
 
-    res = []
+    if os.path.isfile(output_file_name):
+        with open(output_file_name, 'r') as fp:
+            res = json.load(fp)
+    else:
+        res = []
+    data = data[len(res):]
     batch_start = 0
     batch_ind = 0
     batch_num = math.ceil(len(data)/batch_size)
     t = time.time()
     while batch_start < len(data):
-        if batch_ind % 10 == 0:
+        if batch_ind % 100 == 0:
             print(f'Starting batch {batch_ind} out of {batch_num}, time from prev {time.time() - t}', flush=True)
             t = time.time()
+            with open(output_file_name, 'w') as fp:
+                fp.write(json.dumps(res))
         batch_end = min(batch_start + batch_size, len(data))
         image_ids = [data[i]['image_id'] for i in range(batch_start, batch_end)]
         image_paths = [os.path.join(coco_root, f'{split}2014', f'COCO_{split}2014_' + str(image_id).zfill(12) + '.jpg') for image_id in image_ids]
@@ -81,8 +90,8 @@ if __name__ == '__main__':
         else:
             assert False
 
-        batch_start += batch_end
+        batch_start = batch_end
         batch_ind += 1
 
-    with open('ann.json', 'w') as fp:
+    with open(output_file_name, 'w') as fp:
         fp.write(json.dumps(res))
