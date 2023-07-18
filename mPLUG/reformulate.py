@@ -88,6 +88,8 @@ if __name__ == '__main__':
         if question_input['input_ids'].shape[1] > 512:
             inds_to_remove = remove_long_samples(question_input['input_ids'])
             batch_inds = [i for i in batch_inds if i-batch_start not in inds_to_remove]
+            questions = [data[i]['caption'] for i in batch_inds]
+            question_input = tokenizer(questions, padding='longest', return_tensors="pt").to(device)
 
         image_ids = [data[i]['image_id'] for i in batch_inds]
         image_paths = [os.path.join(coco_root, f'{split}2014', f'COCO_{split}2014_' + str(image_id).zfill(12) + '.jpg') for image_id in image_ids]
@@ -96,9 +98,9 @@ if __name__ == '__main__':
         topk_ids, topk_probs = model(images, question_input, answer=None, train=False, k=config['k_test'])
         answers = [tokenizer.decode(topk_ids[i][0]).replace("[SEP]", "").replace("[CLS]", "").replace("[PAD]", "").strip() for i in range(len(topk_ids))]
         if args.output_format == 'image':
-            res += [{'cocoid': data[i]['image_id'], 'sentences': [{'raw': answers[i - batch_start]}], 'filepath': f'{split}2014', 'filename': f'COCO_{split}2014_{str(data[i]["image_id"]).zfill(12)}.jpg'} for i in batch_inds]
+            res += [{'cocoid': data[batch_inds[i]]['image_id'], 'sentences': [{'raw': answers[i]}], 'filepath': f'{split}2014', 'filename': f'COCO_{split}2014_{str(data[batch_inds[i]]["image_id"]).zfill(12)}.jpg'} for i in range(len(batch_inds))]
         elif args.output_format == 'caption':
-            res += [{'image_id': data[i]['image_id'], 'caption': answers[i - batch_start]} for i in batch_inds]
+            res += [{'image_id': data[batch_inds[i]]['image_id'], 'caption': answers[i]} for i in range(len(batch_inds))]
         else:
             assert False
 
