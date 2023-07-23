@@ -97,13 +97,12 @@ class vqa_dataset(Dataset):
         
 
 class vqa_local_dataset(Dataset):
-    def __init__(self, ann_file, transform, coco_root, eos='[SEP]', split="train", max_ques_words=30, read_local_data=True, add_ocr=False, add_object=False):
+    def __init__(self, ann_file, transform, eos='[SEP]', split="train", max_ques_words=30, read_local_data=True, add_ocr=False, add_object=False):
         self.split = split        
         self.ann = []
         self.ann = json.load(open(ann_file,'r'))
 
         self.transform = transform
-        self.coco_root = coco_root
         self.max_ques_words = max_ques_words
         self.eos = eos
         self.read_local_data = read_local_data
@@ -121,7 +120,7 @@ class vqa_local_dataset(Dataset):
     def __getitem__(self, index):    
         ann = self.ann[index]
         
-        image_path = os.path.join(self.coco_root,ann['image'])    
+        image_path = ann['image']
             
         image = Image.open(image_path).convert('RGB')
         image = self.transform(image)
