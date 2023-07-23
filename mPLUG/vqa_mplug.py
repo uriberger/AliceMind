@@ -269,7 +269,8 @@ def main(args, config):
     print("Start training")
     start_time = time.time()
 
-    val_stats = evaluate(model, val_loader, config["label_file"], tokenizer, device, config)
+    if not args.no_eval:
+        val_stats = evaluate(model, val_loader, config["label_file"], tokenizer, device, config)
     for epoch in range(start_epoch, max_epoch):
         if epoch > 0:
             lr_scheduler.step(epoch + warmup_steps)
@@ -288,10 +289,11 @@ def main(args, config):
                 'config': config,
                 'epoch': epoch,
             }, os.path.join(args.output_dir, 'checkpoint_%02d.pth' % epoch))
-        val_stats = evaluate(model, val_loader, config["label_file"], tokenizer, device, config)
-        if epoch >= 5:
-            vqa_result = evaluation(model, test_loader, tokenizer, device, config)
-            result_file = save_result(vqa_result, args.result_dir, 'vqa_result_epoch%d' % epoch)
+        if not args.no_eval:
+            val_stats = evaluate(model, val_loader, config["label_file"], tokenizer, device, config)
+            if epoch >= 5:
+                vqa_result = evaluation(model, test_loader, tokenizer, device, config)
+                result_file = save_result(vqa_result, args.result_dir, 'vqa_result_epoch%d' % epoch)
 
         if args.evaluate:
             break
@@ -324,6 +326,7 @@ if __name__ == '__main__':
     parser.add_argument('--add_ocr', action='store_true')
     parser.add_argument('--add_object', action='store_true')
     parser.add_argument('--accum_steps', default=1, type=int)
+    parser.add_argument('--no_eval', action='store_true')
     parser = deepspeed.add_config_arguments(parser)
     args = parser.parse_args()
 
