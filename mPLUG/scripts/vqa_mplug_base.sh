@@ -9,4 +9,5 @@ venv/bin/python vqa_mplug.py \
     --add_object \
     --max_input_length 80 \
     --max_length 50 \
-    --add_ocr
+    --add_ocr \
+    --no_eval
