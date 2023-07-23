@@ -8,6 +8,7 @@ read_local_data: True
 
 coco_root: '/cs/labs/oabend/uriber/datasets/COCO'
 pascal_root: '/cs/labs/oabend/uriber/datasets/pascal_sentences'
+flickr30k_root: '/cs/labs/oabend/uriber/datasets/flickr30
 bert_config: 'configs/config_bert_stride3.json'
 
 image_res: 384
