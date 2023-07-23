@@ -22,6 +22,7 @@ def remove_long_samples(input_ids):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--split', default='val')
+    parser.add_argument('--dataset', default='COCO', choices=['COCO', 'flickr30k'])
     parser.add_argument('--output_format', default='image')
     parser.add_argument('--model_path', required=True)
     parser.add_argument('--input_file', required=True)
@@ -56,6 +57,7 @@ if __name__ == '__main__':
     device = torch.device('cuda')
     model = model.to(device)
     coco_root = config['coco_root']
+    flickr30k_root = config['flickr30k_root']
 
     normalize = transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711))
     transform = transforms.Compose([
@@ -92,13 +94,19 @@ if __name__ == '__main__':
             question_input = tokenizer(questions, padding='longest', return_tensors="pt").to(device)
 
         image_ids = [data[i]['image_id'] for i in batch_inds]
-        image_paths = [os.path.join(coco_root, f'{split}2014', f'COCO_{split}2014_' + str(image_id).zfill(12) + '.jpg') for image_id in image_ids]
+        if args.dataset == 'COCO':
+            image_paths = [os.path.join(coco_root, f'{split}2014', f'COCO_{split}2014_' + str(image_id).zfill(12) + '.jpg') for image_id in image_ids]
+        elif args.dataset == 'flickr30k':
+            image_paths = [os.path.join(flickr30k_root, 'images', f'{image_id}.jpg') for image_id in image_ids]
         images = torch.cat([transform(Image.open(image_path).convert('RGB')).unsqueeze(0) for image_path in image_paths], dim=0).to(device, non_blocking=True)
 
         topk_ids, topk_probs = model(images, question_input, answer=None, train=False, k=config['k_test'])
         answers = [tokenizer.decode(topk_ids[i][0]).replace("[SEP]", "").replace("[CLS]", "").replace("[PAD]", "").strip() for i in range(len(topk_ids))]
         if args.output_format == 'image':
-            res += [{'cocoid': data[batch_inds[i]]['image_id'], 'sentences': [{'raw': answers[i]}], 'filepath': f'{split}2014', 'filename': f'COCO_{split}2014_{str(data[batch_inds[i]]["image_id"]).zfill(12)}.jpg'} for i in range(len(batch_inds))]
+            if args.dataset == 'COCO':
+                res += [{'cocoid': data[batch_inds[i]]['image_id'], 'sentences': [{'raw': answers[i]}], 'filepath': f'{split}2014', 'filename': f'COCO_{split}2014_{str(data[batch_inds[i]]["image_id"]).zfill(12)}.jpg'} for i in range(len(batch_inds))]
+            elif args.dataset == 'flickr30k':
+                res += [{'cocoid': data[batch_inds[i]]['image_id'], 'sentences': [{'raw': answers[i]}], 'filepath': 'images', 'filename': f'{data[batch_inds[i]]["image_id"]}.jpg'} for i in range(len(batch_inds))]
         elif args.output_format == 'caption':
             res += [{'image_id': data[batch_inds[i]]['image_id'], 'caption': answers[i]} for i in range(len(batch_inds))]
         else:
