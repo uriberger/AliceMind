@@ -30,16 +30,17 @@ if __name__ == '__main__':
     parser.add_argument('--batch_size', type=int, default=16)
     args = parser.parse_args()
 
-    split = args.split
-    image_id_to_split = {}
-    with open('../../CLIP_prefix_caption/dataset_coco.json', 'r') as fp:
-        coco_data = json.load(fp)['images']
-    for sample in coco_data:
-        image_id = sample['cocoid']
-        if split is None:
-            image_id_to_split[image_id] = sample['filepath'].split('2014')[0]
-        else:
-            image_id_to_split[image_id] = split
+    if args.dataset == 'COCO':
+        split = args.split
+        image_id_to_split = {}
+        with open('../../CLIP_prefix_caption/dataset_coco.json', 'r') as fp:
+            coco_data = json.load(fp)['images']
+        for sample in coco_data:
+            image_id = sample['cocoid']
+            if split is None:
+                image_id_to_split[image_id] = sample['filepath'].split('2014')[0]
+            else:
+                image_id_to_split[image_id] = split
 
     batch_size = args.batch_size
     output_file_name = args.output_file + '.json'
