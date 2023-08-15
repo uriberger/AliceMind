@@ -6,14 +6,15 @@ val_file: ['data/vqa_ocr_object/vqa_minival_ocr.json']
 test_file: ['data/vqa_ocr_object/vqa_test_ocr.json']
 label_file: ['data/vqa_ocr_object/minival.json']
 answer_list: 'data/answer_list.json'
-local_train_file: 'reformulation_data/reformulation_train.json'
-local_test_file: 'reformulation_data/reformulation_test.json'
-local_val_file: 'reformulation_data/reformulation_val.json'
+local_train_file: 'reformulation_data/full_reformulation_dataset.json'
+local_test_file: 'reformulation_data/small_reformulation_dataset.json'
+local_val_file: 'reformulation_data/small_reformulation_dataset.json'
 
 read_local_data: True
 vqa_root: 'img_root/coco_2014/'
 vg_root: 'img_root/visual_genome/'
 coco_root: '/cs/labs/oabend/uriber/datasets/COCO'
+flickr30k_root: '/cs/labs/oabend/uriber/datasets/flickr30'
 
 bert_config: 'configs/config_bert_stride3.json'
 
