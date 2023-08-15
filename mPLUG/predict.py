@@ -16,7 +16,7 @@ if __name__ == '__main__':
     parser.add_argument('--image_id_file', required=True)
     parser.add_argument('--model_path', required=True)
     parser.add_argument('--output_file', required=True)
-    parser.add_argument('--batch_size', type=int, default=16)
+    parser.add_argument('--batch_size', type=int, default=4)
     parser.add_argument('--dataset', default='COCO')
     args = parser.parse_args()
         
@@ -51,8 +51,7 @@ if __name__ == '__main__':
     num_patches = int(config["image_res"] * config["image_res"]/(14*14))
     pos_embed = nn.Parameter(torch.zeros(num_patches + 1, 1024).float())
 
-    pos_embed = resize_pos_embed(state_dict['visual_encoder.visual.positional_embedding'].unsqueeze(0),
-                                 pos_embed.unsqueeze(0))
+    #pos_embed = resize_pos_embed(state_dict['visual_encoder.visual.positional_embedding'].unsqueeze(0), pos_embed.unsqueeze(0))
     state_dict['visual_encoder.visual.positional_embedding'] = pos_embed
 
     model.load_state_dict(state_dict, strict=False)
@@ -82,7 +81,7 @@ if __name__ == '__main__':
         batch_end = min(batch_start + args.batch_size, len(image_ids))
         batch_inds = [i for i in range(batch_start, batch_end)]
 
-        questions = [config['bos']+" " for _ in len(batch_end-batch_start)]
+        questions = [config['bos']+" " for _ in range(batch_end-batch_start)]
         question_input = tokenizer(questions, padding='longest', return_tensors="pt").to(device)
 
         batch_image_ids = [image_ids[i] for i in batch_inds]
