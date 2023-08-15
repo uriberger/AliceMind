@@ -1,5 +1,5 @@
 language_evaluation*
-mplug_base.pth
+mplug_*.pth
 *~
 slurm-*.out
 output/*
