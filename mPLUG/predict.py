@@ -11,14 +11,14 @@ from models.tokenization_bert import BertTokenizer
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--iamge_id_file', required=True)
+    parser.add_argument('--image_id_file', required=True)
     parser.add_argument('--model_path', required=True)
     parser.add_argument('--output_file', required=True)
     parser.add_argument('--batch_size', type=int, default=16)
     parser.add_argument('--dataset', default='COCO')
     args = parser.parse_args()
         
-    with open(args.iamge_id_file, 'r') as fp:
+    with open(args.image_id_file, 'r') as fp:
         image_ids = json.load(fp)
 
     config = yaml.load(open('configs/caption_mplug_large.yaml', 'r'), Loader=yaml.Loader)
