@@ -22,6 +22,11 @@ if __name__ == '__main__':
         image_ids = json.load(fp)
 
     config = yaml.load(open('configs/caption_mplug_large.yaml', 'r'), Loader=yaml.Loader)
+    config['text_encoder'] = 'bert-base-uncased'
+    config['text_decoder'] = 'bert-base-uncased'
+    config['beam_size'] = 5
+    config['min_length'] = 8
+    config['max_length'] = 25
 
     if args.dataset == 'COCO':
         with open('../../CLIP_prefix_caption/dataset.coco.json', 'r') as fp:
