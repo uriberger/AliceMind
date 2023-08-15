@@ -6,8 +6,10 @@ import yaml
 import argparse
 from torchvision import transforms
 from PIL import Image
+import torch.nn as nn
 from models.model_caption_mplug import MPLUG
 from models.tokenization_bert import BertTokenizer
+from models.visual_transformers import resize_pos_embed
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -45,10 +47,19 @@ if __name__ == '__main__':
     model = MPLUG(config=config, tokenizer=tokenizer)
     checkpoint = torch.load(args.model_path, map_location='cpu')
     state_dict = checkpoint['model']
+
+    num_patches = int(config["image_res"] * config["image_res"]/(14*14))
+    pos_embed = nn.Parameter(torch.zeros(num_patches + 1, 1024).float())
+
+    pos_embed = resize_pos_embed(state_dict['visual_encoder.visual.positional_embedding'].unsqueeze(0),
+                                 pos_embed.unsqueeze(0))
+    state_dict['visual_encoder.visual.positional_embedding'] = pos_embed
+
     model.load_state_dict(state_dict, strict=False)
     model.eval()
     device = torch.device('cuda')
     model = model.to(device)
+    print('Model loaded')
 
     normalize = transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711))
     transform = transforms.Compose([
