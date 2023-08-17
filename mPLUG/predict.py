@@ -90,7 +90,7 @@ if __name__ == '__main__':
 
         topk_ids, topk_probs = model(images, question_input, answer=None, train=False)
         answers = [tokenizer.decode(topk_ids[i][0]).replace("[SEP]", "").replace("[CLS]", "").replace("[PAD]", "").strip() for i in range(len(topk_ids))]
-        res += [{'image_id': image_ids[i], 'caption': answers[i]} for i in range(len(batch_inds))]
+        res += [{'image_id': batch_image_ids[i], 'caption': answers[i]} for i in range(len(batch_inds))]
 
         batch_start = batch_end
         batch_ind += 1
