@@ -41,7 +41,21 @@ if __name__ == '__main__':
                 image_id_to_split[image_id] = sample['filepath'].split('2014')[0]
             else:
                 image_id_to_split[image_id] = split
-
+    elif args.dataset == 'aic':
+        split = args.split
+        image_id_to_split = {}
+        with open('/cs/labs/oabend/uriber/datasets/ai_challenger/ai_challenger_caption_train_20170902/caption_train_annotations_20170902.json', 'r') as fp:
+                aic_train_data = json.load(fp)
+        with open('/cs/labs/oabend/uriber/datasets/ai_challenger/ai_challenger_caption_validation_20170910/caption_validation_annotations_20170910.json', 'r') as fp:
+            aic_val_data = json.load(fp)
+        for sample in aic_train_data:
+            image_id = int(x['image_id'].split('.jpg')[0], 16)
+            image_id_to_split[image_id] = 'train'
+        for sample in aic_val_data:
+            image_id = int(x['image_id'].split('.jpg')[0], 16)
+            image_id_to_split[image_id] = 'validation'
+        split_to_date = {'train': '20170902', 'validation': '20170910'}
+            
     batch_size = args.batch_size
     output_file_name = args.output_file + '.json'
 
@@ -69,6 +83,7 @@ if __name__ == '__main__':
     model = model.to(device)
     coco_root = config['coco_root']
     flickr30k_root = config['flickr30k_root']
+    aic_root = config['aic_root']
 
     normalize = transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711))
     transform = transforms.Compose([
@@ -109,6 +124,10 @@ if __name__ == '__main__':
             image_paths = [os.path.join(coco_root, f'{image_id_to_split[image_id]}2014', f'COCO_{image_id_to_split[image_id]}2014_' + str(image_id).zfill(12) + '.jpg') for image_id in image_ids]
         elif args.dataset == 'flickr30k':
             image_paths = [os.path.join(flickr30k_root, 'images', f'{image_id}.jpg') for image_id in image_ids]
+        elif args.dataset == 'aic':
+            splits = [image_id_to_split[image_id] for image_id in image_ids]
+            dates = [split_to_date[split] for split in splits]
+            image_paths = [os.path.join(aic_root, f'ai_challenger_caption_{splits[i]}_{dates[i]}', f'caption_{splits[i]}_images_{dates[i]}', f'{hex(image_ids[i])[2:].zfill(40)}.jpg') for i in range(len(image_ids))]
         images = torch.cat([transform(Image.open(image_path).convert('RGB')).unsqueeze(0) for image_path in image_paths], dim=0).to(device, non_blocking=True)
 
         topk_ids, topk_probs = model(images, question_input, answer=None, train=False, k=config['k_test'])

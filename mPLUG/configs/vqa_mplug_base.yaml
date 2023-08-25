@@ -15,6 +15,7 @@ vqa_root: 'img_root/coco_2014/'
 vg_root: 'img_root/visual_genome/'
 coco_root: '/cs/labs/oabend/uriber/datasets/COCO'
 flickr30k_root: '/cs/labs/oabend/uriber/datasets/flickr30'
+aic_root: '/cs/labs/oabend/uriber/datasets/ai_challenger'
 
 bert_config: 'configs/config_bert_stride3.json'
 
