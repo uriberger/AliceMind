@@ -22,7 +22,7 @@ def remove_long_samples(input_ids):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--split')
-    parser.add_argument('--dataset', default='COCO', choices=['COCO', 'flickr30k'])
+    parser.add_argument('--dataset', default='COCO', choices=['COCO', 'flickr30k', 'aic'])
     parser.add_argument('--output_format', default='image')
     parser.add_argument('--model_path', required=True)
     parser.add_argument('--input_file', required=True)
@@ -49,10 +49,10 @@ if __name__ == '__main__':
         with open('/cs/labs/oabend/uriber/datasets/ai_challenger/ai_challenger_caption_validation_20170910/caption_validation_annotations_20170910.json', 'r') as fp:
             aic_val_data = json.load(fp)
         for sample in aic_train_data:
-            image_id = int(x['image_id'].split('.jpg')[0], 16)
+            image_id = int(sample['image_id'].split('.jpg')[0], 16)
             image_id_to_split[image_id] = 'train'
         for sample in aic_val_data:
-            image_id = int(x['image_id'].split('.jpg')[0], 16)
+            image_id = int(sample['image_id'].split('.jpg')[0], 16)
             image_id_to_split[image_id] = 'validation'
         split_to_date = {'train': '20170902', 'validation': '20170910'}
             
