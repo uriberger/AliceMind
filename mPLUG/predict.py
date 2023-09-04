@@ -35,7 +35,11 @@ if __name__ == '__main__':
             coco_data = json.load(fp)['images']
         image_id_to_split = {}
         for x in coco_data:
-            image_id_to_split[x['cocoid']] = x['split']
+            if x['split'] == 'train':
+                split = 'train'
+            else:
+                split = 'val'
+            image_id_to_split[x['cocoid']] = split
         image_id_to_path = lambda x: f'{config["coco_root"]}/{image_id_to_split[x]}2014/COCO_{image_id_to_split[x]}2014_{str(x).zfill(12)}.jpg'
     elif args.dataset == 'flickr30k':
         image_id_to_path = lambda x: f'{config["flickr30k_root"]}/images/{x}.jpg'
