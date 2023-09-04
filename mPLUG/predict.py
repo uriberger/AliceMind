@@ -31,7 +31,7 @@ if __name__ == '__main__':
     config['max_length'] = 25
 
     if args.dataset == 'COCO':
-        with open('../../CLIP_prefix_caption/dataset.coco.json', 'r') as fp:
+        with open('../../CLIP_prefix_caption/dataset_coco.json', 'r') as fp:
             coco_data = json.load(fp)['images']
         image_id_to_split = {}
         for x in coco_data:
