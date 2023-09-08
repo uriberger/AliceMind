@@ -45,7 +45,7 @@ if __name__ == '__main__':
         split = args.split
         image_id_to_split = {}
         with open('/cs/labs/oabend/uriber/datasets/ai_challenger/ai_challenger_caption_train_20170902/caption_train_annotations_20170902.json', 'r') as fp:
-                aic_train_data = json.load(fp)
+            aic_train_data = json.load(fp)
         with open('/cs/labs/oabend/uriber/datasets/ai_challenger/ai_challenger_caption_validation_20170910/caption_validation_annotations_20170910.json', 'r') as fp:
             aic_val_data = json.load(fp)
         for sample in aic_train_data:

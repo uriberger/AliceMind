@@ -1,4 +1,5 @@
 import torch
+import os
 import math
 import time
 import json
@@ -43,6 +44,20 @@ if __name__ == '__main__':
         image_id_to_path = lambda x: f'{config["coco_root"]}/{image_id_to_split[x]}2014/COCO_{image_id_to_split[x]}2014_{str(x).zfill(12)}.jpg'
     elif args.dataset == 'flickr30k':
         image_id_to_path = lambda x: f'{config["flickr30k_root"]}/images/{x}.jpg'
+    elif args.dataset == 'aic':
+        image_id_to_split = {}
+        with open('/cs/labs/oabend/uriber/datasets/ai_challenger/ai_challenger_caption_train_20170902/caption_train_annotations_20170902.json', 'r') as fp:
+            aic_train_data = json.load(fp)
+        with open('/cs/labs/oabend/uriber/datasets/ai_challenger/ai_challenger_caption_validation_20170910/caption_validation_annotations_20170910.json', 'r') as fp:
+            aic_val_data = json.load(fp)
+        for sample in aic_train_data:
+            image_id = int(sample['image_id'].split('.jpg')[0], 16)
+            image_id_to_split[image_id] = 'train'
+        for sample in aic_val_data:
+            image_id = int(sample['image_id'].split('.jpg')[0], 16)
+            image_id_to_split[image_id] = 'validation'
+        split_to_date = {'train': '20170902', 'validation': '20170910'}
+        image_id_to_path = lambda x: f'{config["aic_root"]}/ai_challenger_caption_{image_id_to_split[x]}_{split_to_date[image_id_to_split[x]]}/caption_{image_id_to_split[x]}_images_{split_to_date[image_id_to_split[x]]}/{hex(x)[2:].zfill(40)}.jpg'
     else:
         assert False, f'Unkown dataset {args.dataset}'
 
@@ -70,11 +85,15 @@ if __name__ == '__main__':
         transforms.ToTensor(),
         normalize,
         ])
-    
-    res = []
-    batch_start = 0
+
+    if os.path.isfile(args.output_file):
+        with open(args.output_file, 'r') as fp:
+            res = json.load(fp)
+    else:
+        res = []
+    batch_start = len(res)
     batch_ind = 0
-    batch_num = math.ceil(len(image_ids)/args.batch_size)
+    batch_num = math.ceil((len(image_ids)-len(res))/args.batch_size)
     t = time.time()
     while batch_start < len(image_ids):
         if batch_ind % 100 == 0:
