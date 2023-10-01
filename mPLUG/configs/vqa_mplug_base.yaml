@@ -16,6 +16,7 @@ vg_root: 'img_root/visual_genome/'
 coco_root: '/cs/labs/oabend/uriber/datasets/COCO'
 flickr30k_root: '/cs/labs/oabend/uriber/datasets/flickr30'
 aic_root: '/cs/labs/oabend/uriber/datasets/ai_challenger'
+xm3600_root: '/cs/labs/oabend/uriber/datasets/crossmodal3600'
 
 bert_config: 'configs/config_bert_stride3.json'
 
