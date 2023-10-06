@@ -58,6 +58,8 @@ if __name__ == '__main__':
             image_id_to_split[image_id] = 'validation'
         split_to_date = {'train': '20170902', 'validation': '20170910'}
         image_id_to_path = lambda x: f'{config["aic_root"]}/ai_challenger_caption_{image_id_to_split[x]}_{split_to_date[image_id_to_split[x]]}/caption_{image_id_to_split[x]}_images_{split_to_date[image_id_to_split[x]]}/{hex(x)[2:].zfill(40)}.jpg'
+    elif args.dataset == 'xm3600':
+        image_id_to_path = lambda x: f'{config["xm3600_root"]}/images/{hex(x)[2:].zfill(16)}.jpg'
     else:
         assert False, f'Unkown dataset {args.dataset}'
 
