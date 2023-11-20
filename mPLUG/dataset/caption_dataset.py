@@ -255,7 +255,7 @@ class general_caption_dataset(Dataset):
                 object_label = ""
             if is_train:
                 for sent in sentences:
-                    caption = sent["raw"].lower()
+                    caption = sent.lower()
                     self.ann_new.append({"image": image_path, "caption": caption, "gold_caption": gold_caption, "object_label": object_label})
             else:
                 self.ann_new.append({"image": image_path, "caption": sentences[0].lower(), "gold_caption": gold_caption, "object_label": object_label})
