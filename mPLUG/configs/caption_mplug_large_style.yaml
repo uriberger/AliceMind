@@ -1,0 +1,31 @@
+train_file: ['data/style/humor_train.json']
+val_file: ['data/style/humor_test.json']            
+test_file: ['data/style/humor_test.json']
+
+read_local_data: True
+
+coco_root: '/cs/labs/oabend/uriber/datasets/COCO'
+pascal_root: '/cs/labs/oabend/uriber/datasets/pascal_sentences'
+flickr30k_root: '/cs/labs/oabend/uriber/datasets/flickr30'
+aic_root: '/cs/labs/oabend/uriber/datasets/ai_challenger'
+xm3600_root: '/cs/labs/oabend/uriber/datasets/crossmodal3600'
+bert_config: 'configs/config_bert.json'
+
+image_res: 336
+batch_size_train: 64
+vision_width: 1024
+distill: True
+clip_name: "ViT-L-14"
+batch_size_test: 64 
+k_test: 128
+
+alpha: 0.4
+warm_up: True
+
+eos: '[SEP]'
+bos: '[CLS]'
+prompt: ''
+
+optimizer: {opt: adamW, lr1: 1e-5, lr2: 5e-6, weight_decay: 0.02}
+schedular: {sched: cosine, lr: 1e-5, epochs: 5, min_lr: 1e-6, decay_rate: 1, warmup_lr: 1e-5, warmup_epochs: 4, cooldown_epochs: 0}
+use_checkpoint: true

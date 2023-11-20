@@ -9,6 +9,7 @@ from torch.utils.data import Dataset
 
 from PIL import Image
 from PIL import ImageFile
+from collections import defaultdict
 
 import oss2
 from io import BytesIO
@@ -223,6 +224,77 @@ class coco_dataset(Dataset):
                 break
                 
         return image, caption, object_label, image_id, ann["gold_caption"]
+    
+class general_caption_dataset(Dataset):
+    def __init__(self, ann_file, transform, root_path, max_words=30, read_local_data=True, is_train=True, add_object=False):
+        self.ann = []
+        for f in ann_file:
+            self.ann += json.load(open(f,'r'))
+        self.transform = transform
+        self.max_words = max_words
+        self.read_local_data = read_local_data
+        self.root_path = root_path
+        self.ann_new = []
+        self.add_object = add_object
+        image_path_to_captions = defaultdict(list)
+        for each in self.ann:
+            image_path_to_captions[each['image_path']].append(each['caption'])
+        for each in image_path_to_captions.items():
+            sentences = each[1]
+            image_path = each[0]
+            gold_caption = []
+            for sent in sentences:
+                caption = sent
+                gold_caption.append(caption.lower())
+            if self.add_object:
+                object_list = each["object_label"].split("&&")
+                new_object_list = list(set(object_list))
+                new_object_list.sort(key=object_list.index)
+                object_label = " ".join(new_object_list) 
+            else:
+                object_label = ""
+            if is_train:
+                for sent in sentences:
+                    caption = sent["raw"].lower()
+                    self.ann_new.append({"image": image_path, "caption": caption, "gold_caption": gold_caption, "object_label": object_label})
+            else:
+                self.ann_new.append({"image": image_path, "caption": sentences[0].lower(), "gold_caption": gold_caption, "object_label": object_label})
+        self.ann = self.ann_new
+        del self.ann_new        
+        
+    def __len__(self):
+        return len(self.ann)
+    
+
+    def __getitem__(self, index):    
+        
+        ann = self.ann[index]
+        caption = ann['caption']
+        image_id = ann['image'].split("/")[-1] 
+        object_label = ann['object_label']
+        if self.read_local_data:
+            image_path = os.path.join(self.root_path, ann['image'])
+            image = Image.open(image_path).convert('RGB')
+            image = self.transform(image)
+        else:
+            while not self.bucket.object_exists("mm_feature/"+ann['image']):
+                index = 0 if index == (len(self) - 1) else index + 1
+                ann = self.ann[index]
+            while True:
+                try:
+                    image = self.bucket.get_object("mm_feature/"+ann['image'])
+                    image = BytesIO(image.read())
+                    image = Image.open(image).convert('RGB')
+                    image = self.transform(image)
+                except:
+                    #logging.info("Get image:{} from oss failed, retry.".format(ann['image']))
+                    index = 0 if index == (len(self) - 1) else index + 1
+                    ann = self.ann[index]
+                    continue
+                break
+                
+        return image, caption, object_label, image_id, ann["gold_caption"]
+
 class pretrain_dataset_4m(Dataset):
     def __init__(self, ann_file, transform, max_words=30, read_local_data=True, image_root="", epoch=None):
         self.ann = []
