@@ -9,3 +9,5 @@ automatic_reformulation_data/*
 pascal_data/*
 auto_gt
 *_captions.json
+*_reformulated.json
+del_me*
