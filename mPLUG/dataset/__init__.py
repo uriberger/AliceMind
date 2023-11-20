@@ -73,9 +73,9 @@ def create_dataset(dataset, config, epoch=None):
         test_dataset = pascal_dataset(config['pascal_file'], test_transform, config['pascal_root'], max_words=config['max_length'], is_train=False)
         return train_dataset, val_dataset, test_dataset
     elif dataset== 'general':
-        train_dataset = general_caption_dataset(config['train_file'], train_transform, config['coco_root'], max_words=config['max_length'], is_train=True)
-        val_dataset = general_caption_dataset(config['pascal_file'], test_transform, config['pascal_root'], max_words=config['max_length'], is_train=False)
-        test_dataset = general_caption_dataset(config['pascal_file'], test_transform, config['pascal_root'], max_words=config['max_length'], is_train=False)
+        train_dataset = general_caption_dataset(config['train_file'], train_transform, config['flickr30k_root'], max_words=config['max_length'], is_train=True)
+        val_dataset = general_caption_dataset(config['val_file'], test_transform, config['flickr30k_root'], max_words=config['max_length'], is_train=False)
+        test_dataset = general_caption_dataset(config['test_file'], test_transform, config['flickr30k_root'], max_words=config['max_length'], is_train=False)
         return train_dataset, val_dataset, test_dataset
     elif dataset=='nlvr':   
         train_dataset = nlvr_dataset(config['train_file'], train_transform, config['image_root'])  
