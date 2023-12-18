@@ -153,3 +153,5 @@ if __name__ == '__main__':
 
     with open(output_file_name, 'w') as fp:
         fp.write(json.dumps(res))
+
+    print('Finished!')
