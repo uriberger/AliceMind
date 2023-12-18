@@ -10,4 +10,6 @@ pascal_data/*
 auto_gt
 *_captions.json
 *_reformulated.json
+*_reformulated_general.json
+mplug_re_*
 del_me*
