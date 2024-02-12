@@ -19,6 +19,8 @@ if __name__ == '__main__':
     parser.add_argument('--output_file', required=True)
     parser.add_argument('--batch_size', type=int, default=4)
     parser.add_argument('--dataset', default='COCO')
+    parser.add_argument('--beam_size', type=int, default=5)
+    parser.add_argument('--out_size', type=int, default=1)
     args = parser.parse_args()
         
     with open(args.image_id_file, 'r') as fp:
@@ -27,7 +29,7 @@ if __name__ == '__main__':
     config = yaml.load(open('configs/caption_mplug_large.yaml', 'r'), Loader=yaml.Loader)
     config['text_encoder'] = 'bert-base-uncased'
     config['text_decoder'] = 'bert-base-uncased'
-    config['beam_size'] = 5
+    config['beam_size'] = args.beam_size
     config['min_length'] = 8
     config['max_length'] = 25
 
@@ -113,9 +115,14 @@ if __name__ == '__main__':
         batch_image_paths = [image_id_to_path(x) for x in batch_image_ids]
         images = torch.cat([transform(Image.open(image_path).convert('RGB')).unsqueeze(0) for image_path in batch_image_paths], dim=0).to(device, non_blocking=True)
 
-        topk_ids, topk_probs = model(images, question_input, answer=None, train=False)
-        answers = [tokenizer.decode(topk_ids[i][0]).replace("[SEP]", "").replace("[CLS]", "").replace("[PAD]", "").strip() for i in range(len(topk_ids))]
-        res += [{'image_id': batch_image_ids[i], 'caption': answers[i]} for i in range(len(batch_inds))]
+        if args.out_size > 1:
+            topk_ids, topk_probs = model(images, question_input, answer=None, train=False, out_size=args.out_size, candidates=True)
+            answers = [[tokenizer.decode(topk_ids[i][j]).replace("[SEP]", "").replace("[CLS]", "").replace("[PAD]", "").strip() for j in range(len(topk_ids[i]))] for i in range(len(topk_ids))]
+            res += [{'image_id': batch_image_ids[i], 'captions': answers[i]} for i in range(len(batch_inds))]
+        else:
+            topk_ids, topk_probs = model(images, question_input, answer=None, train=False)
+            answers = [tokenizer.decode(topk_ids[i][0]).replace("[SEP]", "").replace("[CLS]", "").replace("[PAD]", "").strip() for i in range(len(topk_ids))]
+            res += [{'image_id': batch_image_ids[i], 'caption': answers[i]} for i in range(len(batch_inds))]
 
         batch_start = batch_end
         batch_ind += 1
